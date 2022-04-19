@@ -1,138 +1,156 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
-const generateSite = require('./src/writeFile-copyFile');
+const writeFile = require('./src/writeFile-copyFile');
 const employee = require('./lib/employee')
+const manager = require('./lib/manager')
+const intern = require('./lib/intern')
+const engineer = require('./lib/engineer')
+const generateteam = require('./src/pagetemplate')
 
-const promptUser1 = () => {
-    return inquirer.prompt(managerQuestions);
-};
+// Array to hold questions 
+const newstaffData = [];
 
-const promptMore = () => {
-    return inquirer.prompt(addEmployeeQuestion)
-}
+// Array object questions asked in CLI to user
+const questions = async () => {
+  const answers = await inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Enter the name of the employee you wish to add",
+        name: "name",
+      },
+      {
+        type: "input",
+        message: "Enter the id number of the employee you wish to add",
+        name: "id",
+      },
+      {
+        type: "input",
+        message: "Enter the email of the employee you wish to add:",
+        name: "email",
+      },
+      {
+        type: "list",
+        message: "Enter the role of the employee you wish to add:",
+        name: "role",
+        choices: ["Engineer", "Intern", "Manager", "Employee"],
+      },
+    ])
 
-const promptUser2 = () => {
-    return inquirer.prompt(employeeSelectQuestion);
-};
 
-const managerQuestions = [{
-      type: 'input',
-      name: 'managerName',
-      message: 'What is the name of the team manager? (Required)',
-      validate: nameInput => {
-        if (nameInput) {
-          return true;
-        } else {
-          console.log('Please enter the name of the manager!');
-          return false;
-        }
+    
+    //  console.log(answers);
+      // if statement of manager role
+      if (answers.role === "Manager") {
+        const managerAns = await inquirer
+          .prompt([
+            {
+              type: "input",
+              message: "Enter the office number of this manager",
+              name: "officeNumber",
+            },
+          ])
+          const newManager = new manager(
+            answers.name,
+            answers.id,
+            answers.email,
+            managerAns.officeNumber
+          );
+          newstaffData.push(newManager);
+          
+        // if statement for engineer role
+      } else if (answers.role === "Engineer") {
+        const githubAns = await inquirer
+          .prompt([
+            {
+              type: "input",
+              message: "Enter the github user name associated with the Engineer:",
+              name: "github",
+            }
+          ])
+            const newEngineer = new engineer(
+              answers.name,
+              answers.id,
+              answers.email,
+              githubAns.github
+            );
+            newstaffData.push(newEngineer);
+          
+       // if statement for the employee role
+      } else if (answers.role === 'Employee') {
+          const newEmployee = new employee(
+              answers.name,
+              answers.id,
+              answers.email,
+              answers.role
+          );
+          newstaffData.push(newEmployee)
       }
-    },
+       // if statement for intern role
+      else if (answers.role === "Intern") {
+        const internAns = await inquirer
+          .prompt([
+            {
+              type: "input",
+              message: "Enter the school of the intern:",
+              name: "school",
+            },
+          ])
+          
+          const newIntern = new intern(
+            answers.name,
+            answers.id,
+            answers.email,
+            internAns.school
+          );
+          newstaffData.push(newIntern);          
+      } 
 
-    {
-        type:'input',
-        name: 'managerID',
-        message: 'Enter the employee ID:',
-        validate: managerIDinput => {
-            if (managerIDinput) {
-              return true;
+}; 
+//end of questions/prompts
+
+async function promptQuestions() {
+  await questions()
+    
+  
+  const addMemberAns = await inquirer
+    .prompt([
+      {
+        name:'addMember',
+        type: 'list',
+        choices: ['Add a new employee', 'Finalize team', 'Quit'],
+        message: "Select an option to continue:"
+      }
+    ])
+
+
+    if (addMemberAns.addMember === 'Add a new employee') {
+      return promptQuestions()
+    } if (addMemberAns.addMember === 'quit'){
+        const confirmQuit = await inquirer.prompt([{
+            name: 'confirmExit',
+            type: 'confirm',
+            message: 'Are you sure you wish to exit the application?'
+        }, 
+        ])
+            if (confirmQuit.answers === true) {
+            return ''  
             } else {
-              console.log('Please enter the employee ID!');
-              return false;
+                promptQuestions();
             }
-          }
-    },
-
-    {
-        type:'input',
-        name: 'managerEmail',
-        message: 'Enter the email of the employee',
-        validate: managerEmailInput => {
-            if (managerEmailInput) {
-              return true;
-            } else {
-              console.log('Please enter the employee email!');
-              return false;
-            }
-          }
-    },
-
-    {
-        type:'input',
-        name: 'officeNumber',
-        message: 'Please enter the office number of the manager',
-        validate: officeNumberinput => {
-            if (officeNumberinput) {
-                return true;
-            } else {
-                console.log('Please enter the office number of your team manager')
-            }
-        },
-    },  
-
-]
-
-const addEmployeeQuestion =[{
-    type: 'confirm',
-    name: 'addEmployee',
-    message: 'Do you wish to add another employee?',
-    validate: addEmployeeConfirm => {
-        if (addEmployeeConfirm) {
-            promptUser2();
-        }
-        else {
-            return 'All Finished! Generating File.'
-                 }
+        
+    } else {
+    return createTeam();
     }
- },]
+}  
 
- const employeeSelectQuestion = [{
-     type:'checkbox',
-     name: 'employeeSelect',
-     message: 'Please select the employee class you wish to create',
-     choices: {
-     name:'Employee', 
-     name: 'Intern',
-     name: 'Engineer',
-     name: 'Manager'
-    },
-    validate: employeeSelectQuestion => {
-        if (employeeSelectQuestion = 'Employee'){
-            //DO SOMETHING. Employee Question Prompt?
-        }
-    }
-     
- }]
+promptQuestions();
 
-function writeToFile(data) {
-    fs.writeFile('./index.html', data, err => {
-        if (err) {
-            console.log(err);
-            return;
-        // when the Html is created 
-        } else {
-            console.log("HTML generated")
-        }
-    });
+function createTeam () {
+  console.log("new employee", newstaffData)
+  fs.writeFileSync(
+    "./dist/index.html",
+    generateteam(newstaffData),
+     "utf-8"
+  );
 }
-
-//screwy logic to fix here:
-function init() {
-    promptUser1()
-    .then(function(data1) {
-        return JSON.stringify(data1)
-    })
-    .catch(err => {
-        console.log(err);
-    }).then(
-    promptMore()
-    ).then(function(data2) {
-        return JSON.stringify(data2)
-
-    }).then(function(data1, data2,) {
-        writeToFile(data1, data2)
-        })
-
-}
-
-init();

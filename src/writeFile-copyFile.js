@@ -1,5 +1,5 @@
 
-//This is a template from the last assignment, restructure this to generate HTML instead. 
+//This is a template from the last assignment
 const fs = require('fs');
 
 // writing files
