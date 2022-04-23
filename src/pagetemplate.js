@@ -80,7 +80,7 @@ const generateTeam = (team) => {
 </div>
         `;
   };
-
+//array holding the HTML to be appended
   const htmlArr = [];
 
 
@@ -108,7 +108,7 @@ const generateTeam = (team) => {
       .map((employee) => generateEmployee(employee))
       .join("")
   );
-
+//recombines info from html array
   return htmlArr.join("");
 };
 
