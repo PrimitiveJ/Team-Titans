@@ -1,4 +1,5 @@
 const employee = require("../lib/employee");
+//main class that all other classes stem from
 
 it('creates an employee object',() => {
     const Employee = new employee('James', 42069, 'hokecj@gmail.com');
@@ -32,4 +33,4 @@ it('should return the email of a created employee', () => {
 it('should return the given role of the created employee', () => {
     const Employee = new employee('James', 42069, 'hokecj@gmail.com');
     expect(Employee.getRole()).toBe('Employee')
-});
+});  
