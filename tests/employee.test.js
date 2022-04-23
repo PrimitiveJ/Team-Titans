@@ -8,13 +8,6 @@ it('creates an employee object',() => {
   expect(Employee.email).toEqual(expect.any(String));
 }); 
 
-it('should return a class value of employee', () => {
-
-    const Employee = new employee('James', 42069, 'hokecj@gmail.com');
-    expect(Employee.className).toEqual('employee')
-    console.log(Employee.className)
-});
-
 //Tests getName()
 
 it('should return the name of a created employee', () => {
@@ -38,5 +31,5 @@ it('should return the email of a created employee', () => {
 //tests getRole()
 it('should return the given role of the created employee', () => {
     const Employee = new employee('James', 42069, 'hokecj@gmail.com');
-    expect(Employee.getRole()).toBe('employee')
+    expect(Employee.getRole()).toBe('Employee')
 });
